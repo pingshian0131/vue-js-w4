@@ -1,5 +1,5 @@
 <script>
-import Navbar from "@/components/Navbar.vue";
+import Navbar from "@/components/sys/Navbar.vue";
 import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/css/index.css'
 

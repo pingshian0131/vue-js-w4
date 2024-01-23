@@ -1,6 +1,7 @@
 <script>
-import Navbar from "@/components/Navbar.vue";
-import Loading from "@/components/Loading.vue";
+import Navbar from "@/components/sys/Navbar.vue";
+import Loading from 'vue-loading-overlay'
+import 'vue-loading-overlay/dist/css/index.css'
 
 const API_BASE_URL = import.meta.env.VITE_BASE_API_URL;
 const API_PATH = import.meta.env.VITE_API_PATH;
@@ -19,11 +20,18 @@ export default {
     }
   },
   created() {
+    const loader = this.$loading.show({
+      isFullPage: true,
+      canCancel: true,
+      onCancel: this.onCancel
+    })
     if (!this.accessToken) {
       alert('請先登入!');
+      loader.hide();
       window.location.href = '/';
     }
     this.$axios.defaults.headers.common.authorization = this.accessToken;
+    loader.hide();
     this.getAllProducts();
     if (this.accessToken) {
       this.checkUserStatus();
@@ -33,7 +41,30 @@ export default {
     })
   },
   methods: {
+    checkUserStatus() {
+      this.isLogin = 0;
+      const loader = this.$loading.show({
+        isFullPage: true,
+        canCancel: true,
+        onCancel: this.onCancel
+      })
+      this.$axios.post(`${API_BASE_URL}v2/api/user/check`).then(() => {
+        this.isLogin = 1;
+        loader.hide();
+      }).catch((err) => {
+        console.log(err);
+        alert('請重新登入!')
+        this.isLogin = -1;
+        loader.hide();
+        window.location.href = '/';
+      })
+    },
     getAllProducts() {
+      const loader = this.$loading.show({
+        isFullPage: true,
+        canCancel: true,
+        onCancel: this.onCancel
+      })
       this.$axios.get(`${API_BASE_URL}v2/api/${API_PATH}/admin/products/all`).then((res) => {
         this.productsMap = res.data.products;
         let productData = null;
@@ -43,24 +74,25 @@ export default {
           this.products.push(productData)
           this.getProductsSuccess = 1;
         }
+        loader.hide();
       }).catch((err) => {
         console.log(err);
+        loader.hide();
         this.getProductsSuccess = -1;
       })
     },
     displayProduct(productId) {
       this.targetProduct = this.productsMap[productId];
     },
-    checkUserStatus() {
-      this.isLogin = 0;
-      this.$axios.post(`${API_BASE_URL}v2/api/user/check`).then(() => {
-        this.isLogin = 1;
-      }).catch((err) => {
-        console.log(err);
-        alert('請重新登入!')
-        this.isLogin = -1;
-        window.location.href = '/';
-      })
+    showStars(stars) {
+      let starsArr = [];
+      if (stars % 1 !== 0) {
+        stars = Math.floor(stars);
+      }
+      for (let i = 0; i < stars; i++) {
+        starsArr.push(i);
+      }
+      return starsArr;
     },
   }
 }
@@ -71,7 +103,7 @@ export default {
   <template v-if="getProductsSuccess === 1">
     <div class="container">
       <div class="row py-3">
-        <div class="col-md-6" id="product-list">
+        <div class="col-md-7" id="product-list">
           <h2>產品列表</h2>
           <table class="table table-hover mt-4">
             <thead>
@@ -85,6 +117,9 @@ export default {
               </th>
               <th width="150">
                 是否啟用
+              </th>
+              <th width="150">
+                評分
               </th>
               <th width="120">
                 查看細節
@@ -108,6 +143,14 @@ export default {
                   <span>未啟用</span>
                 </template>
               </td>
+              <td width="150" class="text-warning">
+                <template v-for="star in showStars(product.stars)" :key="star">
+                  <font-awesome-icon :icon="['fas', 'star']"/>
+                </template>
+                <template v-if="product.stars % 1 !== 0">
+                  <font-awesome-icon :icon="['fas', 'star-half-alt']"/>
+                </template>
+              </td>
               <td width="120">
                 <button type="button" class="btn btn-primary" @click="displayProduct(product.id)">查看細節</button>
               </td>
@@ -116,7 +159,7 @@ export default {
           </table>
           <p>目前有 <span>{{ products.length }}</span> 項產品</p>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-5">
           <h2>單一產品細節</h2>
           <template v-if="targetProduct">
             <div class="card mb-3">
@@ -126,6 +169,17 @@ export default {
                   {{ targetProduct.title }}
                   <span class="badge bg-primary ms-2">{{ targetProduct.category }}</span>
                 </h5>
+                <div class="mb-3">
+                  <span class="me-2">推薦指數</span>
+                  <span class="text-warning text-nowrap mb-2">
+                    <template v-for="star in showStars(targetProduct.stars)" :key="star">
+                      <font-awesome-icon :icon="['fas', 'star']"/>
+                    </template>
+                    <template v-if="targetProduct.stars % 1 !== 0">
+                      <font-awesome-icon :icon="['fas', 'star-half-alt']"/>
+                    </template>
+                  </span>
+                </div>
                 <p class="card-text">商品描述：{{ targetProduct.description }}</p>
                 <p class="card-text">商品內容：{{ targetProduct.content }}</p>
                 <div class="d-flex">
@@ -149,7 +203,7 @@ export default {
     </div>
   </template>
   <template v-else-if="getProductsSuccess === 0">
-    <Loading />
+    <Loading/>
   </template>
   <template v-else>
     API Server Error

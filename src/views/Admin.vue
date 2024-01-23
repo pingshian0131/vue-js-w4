@@ -1,10 +1,13 @@
 <script>
 import {Modal} from 'bootstrap';
-import Navbar from "@/components/Navbar.vue";
-import AddProductModal from "@/components/AddProduct.vue";
-import EditProductModal from "@/components/EditProduct.vue";
+import Navbar from "@/components/sys/Navbar.vue";
+import AddProductModal from "@/components/modals/AddProductModal.vue";
+import EditProductModal from "@/components/modals/EditProductModal.vue";
+import ViewImageModal from "@/components/modals/ViewImageModal.vue";
+import UploadImageModal from "@/components/modals/UploadImageModal.vue";
 import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/css/index.css'
+import ProgressBar from "@/components/sys/ProgressBar.vue";
 
 const API_BASE_URL = import.meta.env.VITE_BASE_API_URL;
 const API_PATH = import.meta.env.VITE_API_PATH;
@@ -13,8 +16,11 @@ const PRODUCT_API_SERVER = `${API_BASE_URL}v2/api/${API_PATH}/admin/product`;
 
 export default {
   components: {
+    ProgressBar,
     AddProductModal,
     EditProductModal,
+    ViewImageModal,
+    UploadImageModal,
     Loading,
     Navbar
   },
@@ -27,6 +33,8 @@ export default {
       products: [],
       productsMap: {},
       editTargetProduct: null,
+      uploadTargetProduct: null,
+      uploadField: "",
       deleteTargetProduct: null,
       viewTargetImage: null,
       getProductsSuccess: 0,
@@ -104,6 +112,10 @@ export default {
     showEditModal(id) {
       this.editTargetProduct = JSON.parse(JSON.stringify(this.products[id]));
     },
+    showUploadImageModal(id, field) {
+      this.uploadTargetProduct = JSON.parse(JSON.stringify(this.products[id]));
+      this.uploadField = field;
+    },
     showDeleteModal(id) {
       this.deleteTargetProduct = JSON.parse(JSON.stringify(this.products[id]));
       this.confirmDelete();
@@ -123,6 +135,16 @@ export default {
           this.submitDeleteProduct();
         }
       });
+    },
+    showStars(stars) {
+      let starsArr = [];
+      if (stars % 1 !== 0) {
+        stars = Math.floor(stars);
+      }
+      for (let i = 0; i < stars; i++) {
+        starsArr.push(i);
+      }
+      return starsArr;
     },
     failAndReload(action, err = '') {
       this.$swal({
@@ -200,6 +222,7 @@ export default {
                     <th>產品描述</th>
                     <th>產品內容</th>
                     <th>產品上架</th>
+                    <th>產品評分</th>
                     <th>產品主圖</th>
                     <th>其他圖片1</th>
                     <th>其他圖片2</th>
@@ -238,9 +261,25 @@ export default {
                         <span class="text-white bg-secondary px-2 py-1" style="border-radius: 5px;">未啟用</span>
                       </template>
                     </td>
+                    <td class="text-warning text-nowrap">
+                      <template v-for="star in showStars(product.stars)" :key="star">
+                        <font-awesome-icon :icon="['fas', 'star']"/>
+                      </template>
+                      <template v-if="product.stars % 1 !== 0">
+                        <font-awesome-icon :icon="['fas', 'star-half-alt']"/>
+                      </template>
+                    </td>
                     <td>
+                      <button type="button" class="btn btn-secondary text-nowrap"
+                              data-bs-toggle="modal" data-bs-target="#uploadImageModal"
+                              :id="'id-edit-btn_' + id" @click="showUploadImageModal(id, 'imageUrl')">
+                        <font-awesome-icon :icon="['fas', 'arrow-up-from-bracket']" />
+                      </button>
                       <template v-if="product.imageUrl">
                         <img :src="product.imageUrl" alt="" class="img-preview" @click="viewImage">
+                      </template>
+                      <template v-else>
+                        <span class="text-secondary">無</span>
                       </template>
                     </td>
                     <td>
@@ -299,6 +338,10 @@ export default {
   <AddProductModal :products-map="productsMap"/>
 
   <EditProductModal :edit-target-product="editTargetProduct"/>
+
+  <ViewImageModal :view-target-image="viewTargetImage"/>
+
+  <UploadImageModal :upload-target-product="uploadTargetProduct" :upload-field="uploadField"/>
 
 </template>
 

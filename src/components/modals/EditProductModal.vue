@@ -1,12 +1,6 @@
 <script>
-import {Modal} from 'bootstrap';
-import Loading from 'vue-loading-overlay'
-import 'vue-loading-overlay/dist/css/index.css'
-
-
 const API_BASE_URL = import.meta.env.VITE_BASE_API_URL;
 const API_PATH = import.meta.env.VITE_API_PATH;
-
 const PRODUCT_API_SERVER = `${API_BASE_URL}v2/api/${API_PATH}/admin/product`;
 export default {
   components: {},
@@ -185,6 +179,17 @@ export default {
                   </div>
                 </div>
 
+                <!-- 產品評分 -->
+                <div class="row align-items-center mb-3">
+                  <div class="col-auto">
+                    <label for="id-edit-product-is_enabled" class="form-label">產品評分</label>
+                  </div>
+                  <div class="col">
+                    <input class="form-control" type="text" id="id-edit-product-stars"
+                           v-model="editTargetProduct.stars">
+                  </div>
+                </div>
+
                 <!-- 產品圖片 -->
                 <div class="row align-items-center mb-3">
                   <div class="col-auto">
@@ -242,9 +247,7 @@ export default {
 
               </div>
             </form>
-
           </div>
-
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -256,24 +259,6 @@ export default {
     </div>
   </div>
 
-  <!-- View Image Modal -->
-  <div class="modal fade" id="viewImageModal" data-bs-keyboard="false" tabindex="-1"
-       aria-labelledby="viewImageModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content" v-if="viewTargetImage">
-        <div class="modal-header bg-secondary text-white">
-          <h5 class="modal-title" id="editProductModalLabel">View Image: </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <img :src="viewTargetImage" alt="" class="img-fluid" width="100%">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
 </template>
 
 <style scoped>
