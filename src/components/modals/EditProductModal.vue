@@ -87,7 +87,7 @@ export default {
         </div>
         <div class="modal-body">
           <div class="row mb-3">
-            <form id="add-product" action="#" method="post">
+            <form id="edit-product-form" action="#" method="post">
               <div class="container">
 
                 <!-- 請輸入產品名稱 -->
