@@ -77,7 +77,7 @@ export default {
 
 <template>
   <!-- Edit Product Modal -->
-  <div class="modal fade" id="editProductModal" data-bs-keyboard="false" tabindex="-1"
+  <div class="modal fade" id="editProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
        aria-labelledby="editProductModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content" v-if="editTargetProduct">

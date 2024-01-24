@@ -78,6 +78,7 @@ export default {
         let product;
         for (let key in this.products) {
           product = this.products[key];
+          let images = product.imagesUrl;
           this.productsMap[product.title] = product;
         }
         this.getProductsSuccess = 1;
@@ -270,36 +271,63 @@ export default {
                       </template>
                     </td>
                     <td>
-                      <button type="button" class="btn btn-secondary text-nowrap"
-                              data-bs-toggle="modal" data-bs-target="#uploadImageModal"
-                              :id="'id-edit-btn_' + id" @click="showUploadImageModal(id, 'imageUrl')">
-                        <font-awesome-icon :icon="['fas', 'arrow-up-from-bracket']" />
-                      </button>
                       <template v-if="product.imageUrl">
                         <img :src="product.imageUrl" alt="" class="img-preview" @click="viewImage">
                       </template>
                       <template v-else>
-                        <span class="text-secondary">無</span>
+                        <button type="button" class="btn btn-secondary text-nowrap"
+                                data-bs-toggle="modal" data-bs-target="#uploadImageModal"
+                                :id="'id-edit-btn_' + id" @click="showUploadImageModal(id, 'imageUrl')">
+                          <font-awesome-icon :icon="['fas', 'arrow-up-from-bracket']"/>
+                        </button>
                       </template>
                     </td>
                     <td>
                       <template v-if="product.imagesUrl[0]">
                         <img :src="product.imagesUrl[0]" alt="" class="img-preview" @click="viewImage">
                       </template>
+                      <template v-else>
+                        <button type="button" class="btn btn-secondary text-nowrap"
+                                data-bs-toggle="modal" data-bs-target="#uploadImageModal"
+                                :id="'id-edit-btn_' + id" @click="showUploadImageModal(id, 'imagesUrl')">
+                          <font-awesome-icon :icon="['fas', 'arrow-up-from-bracket']"/>
+                        </button>
+                      </template>
                     </td>
                     <td>
                       <template v-if="product.imagesUrl[1]">
                         <img :src="product.imagesUrl[1]" alt="" class="img-preview" @click="viewImage">
+                      </template>
+                      <template v-else>
+                        <button type="button" class="btn btn-secondary text-nowrap"
+                                data-bs-toggle="modal" data-bs-target="#uploadImageModal"
+                                :id="'id-edit-btn_' + id" @click="showUploadImageModal(id, 'imagesUrl')">
+                          <font-awesome-icon :icon="['fas', 'arrow-up-from-bracket']"/>
+                        </button>
                       </template>
                     </td>
                     <td>
                       <template v-if="product.imagesUrl[2]">
                         <img :src="product.imagesUrl[2]" alt="" class="img-preview" @click="viewImage">
                       </template>
+                      <template v-else>
+                        <button type="button" class="btn btn-secondary text-nowrap"
+                                data-bs-toggle="modal" data-bs-target="#uploadImageModal"
+                                :id="'id-edit-btn_' + id" @click="showUploadImageModal(id, 'imagesUrl')">
+                          <font-awesome-icon :icon="['fas', 'arrow-up-from-bracket']"/>
+                        </button>
+                      </template>
                     </td>
                     <td>
                       <template v-if="product.imagesUrl[3]">
                         <img :src="product.imagesUrl[3]" alt="" class="img-preview" @click="viewImage">
+                      </template>
+                      <template v-else>
+                        <button type="button" class="btn btn-secondary text-nowrap"
+                                data-bs-toggle="modal" data-bs-target="#uploadImageModal"
+                                :id="'id-edit-btn_' + id" @click="showUploadImageModal(id, 'imagesUrl')">
+                          <font-awesome-icon :icon="['fas', 'arrow-up-from-bracket']"/>
+                        </button>
                       </template>
                     </td>
                   </tr>

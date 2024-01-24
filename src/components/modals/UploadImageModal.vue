@@ -1,5 +1,6 @@
 <script>
 import ProgressBar from '@/components/sys/ProgressBar.vue'
+import {Modal} from "bootstrap";
 
 const API_BASE_URL = import.meta.env.VITE_BASE_API_URL;
 const API_PATH = import.meta.env.VITE_API_PATH;
@@ -20,24 +21,31 @@ export default {
   data() {
     return {
       products: null,
-      msg: '123'
+      loadingStatus: false,
+      msg: 'Uploading...'
     }
   },
   methods: {
     updateProductImage(url, field) {
-      let images;
+      let images = [];
       if (field === 'imageUrl') {
         images = url;
       } else if (field === 'imagesUrl') {
-        images = this.uploadTargetProduct.imagesUrl;
-        if (this.uploadTargetProduct.imagesUrl.length < 5 && this.uploadTargetProduct.imagesUrl.length >= 0) {
+        this.uploadTargetProduct.imagesUrl.forEach((item) => {
+          if (item.length > 0) {
+            images.push(item);
+          }
+        })
+        if (images.length < 5 && images.length >= 0) {
           images.push(url);
         } else {
           this.failAndReload('uploaded', 'Too many images');
+          this.loadingStatus = false;
           return;
         }
       } else {
         this.failAndReload('uploaded', 'Invalid field');
+        this.loadingStatus = false;
         return;
       }
 
@@ -59,18 +67,25 @@ export default {
             icon: "success",
             button: "OK",
           }).then(() => {
+            this.loadingStatus = false;
             window.location.reload();
           });
         } else {
-          console.log(res.data)
+          this.loadingStatus = false;
           this.failAndReload('uploaded');
         }
       }).catch((err) => {
-        console.log(err)
+        this.loadingStatus = false;
         this.failAndReload('uploaded', err);
       })
     },
+    closeModal() {
+      const modal = Modal.getInstance(document.getElementById('uploadImageModal'));
+      modal.hide();
+    },
     uploadImage() {
+      this.closeModal();
+      this.loadingStatus = true;
       const file = document.getElementById('formFile').files[0];
       const formData = new FormData();
       formData.append('file', file);
@@ -81,12 +96,13 @@ export default {
       }).then((res) => {
         if (res.data.success === true) {
           let url = res.data.imageUrl;
-          alert("Image uploaded successfully!")
           this.updateProductImage(url, this.uploadField);
         } else {
+          this.loadingStatus = false;
           this.failAndReload('uploaded');
         }
       }).catch((err) => {
+        this.loadingStatus = false;
         this.failAndReload('uploaded', err);
       })
     },
@@ -119,20 +135,21 @@ export default {
 </script>
 
 <template>
-  <ProgressBar :text="msg"/>
+  <template v-if="loadingStatus">
+    <ProgressBar :text="msg"/>
+  </template>
   <div class="modal fade" id="uploadImageModal" data-bs-keyboard="false" tabindex="-1"
        aria-labelledby="uploadImageModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content" v-if="uploadTargetProduct">
         <form action="#" enctype="multipart/form-data" method="post">
           <div class="modal-header bg-secondary text-white">
-            <h5 class="modal-title" id="editProductModalLabel">View Image: </h5>
+            <h5 class="modal-title" id="editProductModalLabel">Upload Image: </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <div class="mb-3">
-              <label for="formFile" class="form-label">Default file input example</label>
-              <input class="form-control" type="file" id="formFile" name="file-to-upload">
+              <input class="form-control mt-2" type="file" id="formFile" name="file-to-upload">
             </div>
           </div>
           <div class="modal-footer">
