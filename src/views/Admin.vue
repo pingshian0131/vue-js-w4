@@ -365,12 +365,6 @@ export default {
         </div>
       </div>
     </div>
-    <div class="row justify-content-start mb-5 mt-3" v-else>
-      <h1>API Server Error</h1>
-    </div>
-  </div>
-  <div class="container" v-else>
-    loading
   </div>
 
   <AddProductModal :products-map="productsMap"/>

@@ -212,8 +212,5 @@ export default {
       </div>
     </div>
   </template>
-  <template v-else>
-    API Server Error
-  </template>
 
 </template>
