@@ -8,6 +8,7 @@ import UploadImageModal from "@/components/modals/UploadImageModal.vue";
 import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/css/index.css'
 import ProgressBar from "@/components/sys/ProgressBar.vue";
+import Pagination from "@/components/pagination.vue";
 
 const API_BASE_URL = import.meta.env.VITE_BASE_API_URL;
 const API_PATH = import.meta.env.VITE_API_PATH;
@@ -22,7 +23,8 @@ export default {
     ViewImageModal,
     UploadImageModal,
     Loading,
-    Navbar
+    Navbar,
+    Pagination,
   },
   data() {
     return {
@@ -32,6 +34,7 @@ export default {
       targetAddProduct: null,
       products: [],
       productsMap: {},
+      pagination: {},
       editTargetProduct: null,
       uploadTargetProduct: null,
       uploadField: "",
@@ -67,14 +70,17 @@ export default {
         window.location.href = '/';
       })
     },
-    getAllProducts() {
+    getAllProducts(page = 1) {
+      const url = `${API_BASE_URL}v2/api/${API_PATH}/admin/products?page=${page}`;
       const loader = this.$loading.show({
         isFullPage: true,
         canCancel: true,
         onCancel: this.onCancel
       })
-      this.$axios.get(`${API_BASE_URL}v2/api/${API_PATH}/admin/products/all`).then((res) => {
-        this.products = res.data.products;
+      this.$axios.get(url).then((res) => {
+        const { products, pagination } = res.data;
+        this.products = products;
+        this.pagination = pagination;
         let product;
         for (let key in this.products) {
           product = this.products[key];
@@ -162,7 +168,7 @@ export default {
 
 <template>
   <Navbar :login-status=isLogin :page="page"></Navbar>
-  <div class="container mt-5" v-if="isLogin === 1">
+  <div class="container mt-5" v-if="isLogin">
     <div class="row mt-3">
       <div class="col-auto">
         <h1>Admin</h1>
@@ -351,16 +357,20 @@ export default {
           </div>
         </div>
       </div>
-    </div>
-    <div class="row justify-content-start mb-5 mt-3" v-else-if="getProductsSuccess === 0">
-      <Loading/>
+      <div class="col-12">
+        <div class="row justify-content-center">
+          <div class="col-auto">
+            <Pagination :pages="pagination" />
+          </div>
+        </div>
+      </div>
     </div>
     <div class="row justify-content-start mb-5 mt-3" v-else>
       <h1>API Server Error</h1>
     </div>
   </div>
   <div class="container" v-else>
-    <Loading/>
+    loading
   </div>
 
   <AddProductModal :products-map="productsMap"/>

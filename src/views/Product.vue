@@ -2,18 +2,20 @@
 import Navbar from "@/components/sys/Navbar.vue";
 import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/css/index.css'
+import Pagination from "@/components/pagination.vue";
 
 const API_BASE_URL = import.meta.env.VITE_BASE_API_URL;
 const API_PATH = import.meta.env.VITE_API_PATH;
 
 export default {
-  components: {Loading, Navbar},
+  components: {Pagination, Loading, Navbar},
   data() {
     return {
       isLogin: -1,
       page: 'product',
       accessToken: /accessToken=([^;]+)/.exec(document.cookie) && /accessToken=([^;]+)/.exec(document.cookie)[1],
       products: [],
+      pagination: {},
       productsMap: {},
       targetProduct: null,
       getProductsSuccess: 0,
@@ -59,14 +61,17 @@ export default {
         window.location.href = '/';
       })
     },
-    getAllProducts() {
+    getAllProducts(page = 1) {
       const loader = this.$loading.show({
         isFullPage: true,
         canCancel: true,
         onCancel: this.onCancel
       })
-      this.$axios.get(`${API_BASE_URL}v2/api/${API_PATH}/admin/products/all`).then((res) => {
-        this.productsMap = res.data.products;
+      const url = `${API_BASE_URL}v2/api/${API_PATH}/admin/products?page=${page}`;
+      this.$axios.get(url).then((res) => {
+        const { products, pagination } = res.data;
+        this.pagination = pagination;
+        this.productsMap = products;
         let productData = null;
         for (let key in this.productsMap) {
           productData = this.productsMap[key];
@@ -201,9 +206,11 @@ export default {
         </div>
       </div>
     </div>
-  </template>
-  <template v-else-if="getProductsSuccess === 0">
-    <Loading/>
+    <div class="row justify-content-center mb-5">
+      <div class="col-auto">
+        <Pagination :pages="pagination" />
+      </div>
+    </div>
   </template>
   <template v-else>
     API Server Error
